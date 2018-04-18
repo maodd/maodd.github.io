@@ -90,13 +90,29 @@ jQuery(document).ready(function($) {
     });
     if (ferror) return false;
     else var str = $(this).serialize();
+
+    var data = $(this).serializeArray().reduce(function(obj, item) {
+        obj[item.name] = item.value;
+        return obj;
+    }, {});
+
+    console.log(data);
     $.ajax({
       type: "POST",
-      url: "contactform/contactform.php",
-      data: str,
+      headers: {
+        'X-Parse-Application-Id':'QKNoKbq76lL8BimtH3fkOQgOVpShlRjHeBID3HfP',
+        'X-Parse-REST-API-Key':'AE7XJ7Drawv4dqfi2sD2rgC6TSHNISqJl3VHPeSf'
+      },
+      contentType: "application/json",
+      dataType: 'json',
+      url: "https://pg-app-9n7l0umow0580c4b7i5dhy6istr4je.scalabl.cloud/1/functions/sendEmail",
+      data: '{"toEmail":"maodd.ca@gmail.com", "subject":"Inquery from frankmao.com - ' + data.subject 
+      +'", "body":"'
+      + data.message + '\\n\\nsent from '+ data.email + '\\n\\nby '+ data.name 
+      + '"}',
       success: function(msg) {
         // alert(msg);
-        if (msg == 'OK') {
+        if (msg && msg.result && msg.result == 'Email Sent') {
           $("#sendmessage").addClass("show");
           $("#errormessage").removeClass("show");
           $('.contactForm').find("input, textarea").val("");
